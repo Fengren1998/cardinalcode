@@ -30,7 +30,7 @@ class GameMap():
 
             # run through the other rooms and see if they intersect with this one
             for other_room in rooms:
-                if new_room.intersect(other_room):
+                if(new_room.intersect(other_room)):
                     break
             else:
                 # this means there are no intersections, so this room is valid
@@ -41,7 +41,7 @@ class GameMap():
                 # center coordinates of new room, will be useful later
                 (new_x, new_y) = new_room.center()
 
-                if num_rooms == 0:
+                if(num_rooms == 0):
                     # this is the first room, where the player starts at
                     player.x = new_x
                     player.y = new_y
@@ -53,7 +53,7 @@ class GameMap():
                     (prev_x, prev_y) = rooms[num_rooms - 1].center()
 
                     # flip a coin (random number that is either 0 or 1)
-                    if randint(0, 1) == 1:
+                    if(randint(0, 1) == 1):
                         # first move horizontally, then vertically
                         self.create_h_tunnel(prev_x, new_x, prev_y)
                         self.create_v_tunnel(prev_y, new_y, new_x)
@@ -84,6 +84,6 @@ class GameMap():
             self.tiles[x][y].block_sight = False
 
     def is_blocked(self, x, y):
-        if self.tiles[x][y].blocked:
+        if(self.tiles[x][y].blocked):
             return True
         return False
