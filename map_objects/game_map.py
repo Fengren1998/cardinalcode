@@ -1,5 +1,9 @@
 import libtcodpy as libtcod
 from entity import Entity
+
+from components.ai import BasicMonster
+from components.fighter import Fighter
+
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
 from random import randint
@@ -56,14 +60,14 @@ class GameMap():
                     (prev_x, prev_y) = rooms[num_rooms - 1].center()
 
                     # flip a coin (random number that is either 0 or 1)
-                    if(randint(0, 1) == 1):
-                        # first move horizontally, then vertically
-                        self.create_h_tunnel(prev_x, new_x, prev_y)
-                        self.create_v_tunnel(prev_y, new_y, new_x)
+                    if(randint(0, 100) < 80):
+                        fighter_component = Fighter(hp=10, defense=0, power=3)
+                        ai_component = BasicMonster()
+                        monster = Entity(x, y, 'o', libtcod.desaturated_green, 'Orc', blocks=True, fighter=fighter_component, ai=ai_component)
                     else:
-                        # first move vertically, then horizontally
-                        self.create_v_tunnel(prev_y, new_y, prev_x)
-                        self.create_h_tunnel(prev_x, new_x, new_y)
+                        fighter_component = Fighter(hp=16, defense=1, power=4)
+                        ai_component = BasicMonster()
+                        monster = Entity(x, y, 'T', libtcod.darker_green, 'Troll', blocks=True, fighter=fighter_component, ai=ai_component)
 
                         # finally, append the new room to the list
 
