@@ -12,8 +12,17 @@ from game_states import GameStates
 def main():
     screen_width = 80
     screen_height = 50
+
+    bar_width = 20
+    panel_height = 7
+    panel_y = screen_height - panel_height
+
+    message_x = bar_width + 2
+    message_width = screen_width - bar_width - 2
+    message_height = panel_height - 1
+
     map_width = 80
-    map_height = 45
+    map_height = 43
 
     room_max_size = 10
     room_min_size = 6
@@ -41,6 +50,7 @@ def main():
     libtcod.console_init_root(screen_width, screen_height, 'Cardinal Code', False) #boolean is fullscreen or not
 
     con = libtcod.console_new(screen_width, screen_height)
+    panel = libtcod.console_new(screen_width, panel_height)
 
     game_map = GameMap(map_width, map_height)
     game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room)
@@ -60,7 +70,7 @@ def main():
         if(fov_recompute):
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y,colors)
 
         libtcod.console_flush()
 
