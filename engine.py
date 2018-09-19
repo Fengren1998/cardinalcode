@@ -4,9 +4,12 @@ from components.fighter import Fighter
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from map_objects.game_map import GameMap
+
 from input_handlers import handle_keys
-from render_functions import render_all, clear_all
+from render_functions import render_all, clear_all, RenderOrder
 from fov_functions import initialize_fov, recompute_fov
+
+from game_messages import MessageLog
 from game_states import GameStates
 
 def main():
@@ -42,7 +45,7 @@ def main():
     }
 
     fighter_component = Fighter(hp=30, defense=2, power=5)
-    player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, fighter=fighter_component)
+    player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component)
     entities = [player]
 
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
@@ -58,6 +61,8 @@ def main():
     fov_recompute = True
 
     fov_map = initialize_fov(game_map)
+
+    message_log = MessageLog(message_x, message_width, message_height)
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
@@ -141,7 +146,7 @@ def main():
                             else:
                                 message = kill_monster(dead_entity)
 
-                            print(message)
+                            message_log.add_message(message)
 
                             if game_state == GameStates.PLAYER_DEAD:
                                 break
