@@ -13,6 +13,7 @@ from game_messages import MessageLog
 from game_states import GameStates
 
 def main():
+    # Initiate important variables
     screen_width = 80
     screen_height = 50
 
@@ -44,6 +45,7 @@ def main():
         'light_ground': libtcod.Color(200, 180, 50),
     }
 
+    # Initiate the objects that will be important in rendering and the map
     fighter_component = Fighter(hp=30, defense=2, power=5)
     player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component)
     entities = [player]
@@ -69,34 +71,44 @@ def main():
 
     game_state = GameStates.PLAYERS_TURN
 
+    # Main game loop
     while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
+        # fov_recompute tells if the render function should recompute the FOV
+        # recompute_fov will recompute the FOV from render_functions.py based on the initialized variables
         if(fov_recompute):
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, colors)
+        # Renders the map and the screens
+        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors)
 
         libtcod.console_flush()
 
+        # Clears entities whose position changed
         clear_all(con, entities)
 
+        # Get what key was pressed, from sets of dictionaries
         action = handle_keys(key)
 
+        # Then get the action from the sets of dictionaries established in input_handlers.py
         move = action.get('move')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
         player_turn_results = []
 
+        # If move has a value and the game_state is the player's state
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
             destination_x = player.x + dx
             destination_y = player.y + dy
 
+            # If the player's destination is not blocked, do something
             if not game_map.is_blocked(destination_x, destination_y):
                 target = get_blocking_entities_at_location(entities, destination_x, destination_y)
 
+                # If there is an entity at the destination, do this
                 if target:
                     player.fighter.attack(target)
                     attack_results = player.fighter.attack(target)
@@ -119,7 +131,7 @@ def main():
             dead_entity = player_turn_result.get('dead')
 
             if message:
-                print(message)
+                message_log.add_message(message)
             if dead_entity:
                 if dead_entity == player:
                     message, game_state = kill_player(dead_entity)
@@ -127,8 +139,6 @@ def main():
                     message = kill_monster(dead_entity)
 
                 message_log.add_message(message)
-
-                print(message)
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
