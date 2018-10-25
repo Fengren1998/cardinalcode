@@ -21,7 +21,7 @@ def handle_keys(key):
     elif key_char == 'n':
         return {'move': (1, 1)}
 
-    if key_charr == 'g':
+    if key_char == 'g':
         return {'pickup': True}
 
     if(key.vk == libtcod.KEY_ENTER and key.lalt):

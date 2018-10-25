@@ -10,7 +10,7 @@ from input_handlers import handle_keys
 from render_functions import render_all, clear_all, RenderOrder
 from fov_functions import initialize_fov, recompute_fov
 
-from game_messages import MessageLog
+from game_messages import Message, MessageLog
 from game_states import GameStates
 
 def main():
@@ -124,6 +124,16 @@ def main():
 
                     game_state = GameStates.ENEMY_TURN
 
+        elif pickup and game_state == GameStates.PLAYERS_TURN:
+            for entity in entities:
+                if entity.item and entity.x == player.x and entity.y == player.y:
+                    pickup_results = player.inventory.add_item(entity)
+                    player_turn_results.extend(pickup_results)
+
+                    break
+            else:
+                message_log.add_message(Message('There is nothing here to pickup.', libtcod.yellow))
+
         if exit:
             return True
 
@@ -133,6 +143,7 @@ def main():
         for player_turn_result in player_turn_results:
             message = player_turn_result.get('message')
             dead_entity = player_turn_result.get('dead')
+            item_added = player_turn_result.get('item_added')
 
             if message:
                 message_log.add_message(message)
@@ -143,6 +154,11 @@ def main():
                     message = kill_monster(dead_entity)
 
                 message_log.add_message(message)
+
+            if item_added:
+                entities.remove(item_added)
+
+                game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
